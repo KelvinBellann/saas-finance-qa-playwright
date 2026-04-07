@@ -12,20 +12,27 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
-  workers: undefined,
+  workers: isCI ? 2 : undefined,
   timeout: 45_000,
   expect: {
     timeout: 10_000,
   },
   outputDir: 'test-results',
-  reporter: [['list']],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never', outputFolder: 'playwright-report' }],
+    ['json', { outputFile: 'artifacts/reports/playwright-results.json' }],
+    ['junit', { outputFile: 'artifacts/reports/junit.xml' }],
+  ],
   use: {
     baseURL,
     headless: process.env.HEADLESS !== 'false',
     testIdAttribute: 'data-testid',
-    trace: 'off',
-    screenshot: 'off',
-    video: 'off',
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
     viewport: { width: 1440, height: 900 },
     ignoreHTTPSErrors: true,
   },
@@ -38,8 +45,25 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
+      testMatch: /tests[\\/]+e2e[\\/].*\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
+        baseURL,
+      },
+    },
+    {
+      name: 'firefox',
+      testMatch: /tests[\\/]+e2e[\\/].*\.spec\.ts/,
+      use: {
+        ...devices['Desktop Firefox'],
+        baseURL,
+      },
+    },
+    {
+      name: 'webkit',
+      testMatch: /tests[\\/]+e2e[\\/].*\.spec\.ts/,
+      use: {
+        ...devices['Desktop Safari'],
         baseURL,
       },
     },
@@ -48,6 +72,9 @@ export default defineConfig({
       testMatch: /tests[\\/]+api[\\/].*\.spec\.ts/,
       use: {
         baseURL,
+        extraHTTPHeaders: {
+          Accept: 'application/json',
+        },
       },
     },
   ],
