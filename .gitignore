@@ -1,0 +1,14 @@
+node_modules/
+playwright-report/
+test-results/
+.env
+.git.backup-*/
+artifacts/**
+!artifacts/
+!artifacts/.gitkeep
+!artifacts/k6/
+artifacts/k6/**
+!artifacts/k6/.gitkeep
+!artifacts/reports/
+artifacts/reports/**
+!artifacts/reports/.gitkeep
