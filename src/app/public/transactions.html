@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentinel Finance | Transacoes</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="content-header">
+          <p class="eyebrow">Sentinel Finance OS</p>
+          <h1 data-testid="transactions-page-title">Gestao de transacoes</h1>
+          <p class="muted">Crie, aprove e conclua pagamentos com rastreabilidade por status.</p>
+        </div>
+        <div class="user-area">
+          <div>
+            <strong data-testid="app-user-name">Carregando...</strong>
+            <div class="muted" data-testid="app-user-role"></div>
+          </div>
+          <button class="button button--secondary" type="button" data-testid="logout-button">Sair</button>
+        </div>
+      </header>
+
+      <nav class="nav-tabs">
+        <a href="/dashboard" data-nav="dashboard">Dashboard</a>
+        <a href="/transactions" data-nav="transactions">Transacoes</a>
+        <a href="/statement" data-nav="statement">Extrato</a>
+        <a href="/reports" data-nav="reports">Relatorios</a>
+      </nav>
+
+      <section class="panel">
+        <div class="content-header">
+          <h2 style="font-size: 1.4rem;">Nova transacao financeira</h2>
+          <p class="muted">Use dados reais de negocio para demonstrar cobertura E2E consistente.</p>
+        </div>
+
+        <form class="form-grid" data-testid="transaction-form">
+          <div class="field-group">
+            <label for="transaction-description">Descricao</label>
+            <input id="transaction-description" data-testid="transaction-description-input" name="description" required />
+          </div>
+          <div class="field-group">
+            <label for="transaction-beneficiary">Beneficiario</label>
+            <input id="transaction-beneficiary" data-testid="transaction-beneficiary-input" name="beneficiary" required />
+          </div>
+          <div class="field-group">
+            <label for="transaction-category">Categoria</label>
+            <select id="transaction-category" data-testid="transaction-category-select" name="category" required>
+              <option value="software">Software</option>
+              <option value="operations">Operations</option>
+              <option value="people">People</option>
+              <option value="vendors">Vendors</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="transaction-amount">Valor (BRL)</label>
+            <input
+              id="transaction-amount"
+              data-testid="transaction-amount-input"
+              name="amount"
+              type="number"
+              step="0.01"
+              min="0.01"
+              required
+            />
+          </div>
+          <div style="display: flex; align-items: end;">
+            <button class="button button--primary" type="submit" data-testid="transaction-submit-button">
+              Registrar transacao
+            </button>
+          </div>
+        </form>
+
+        <p class="feedback" data-testid="transaction-feedback" aria-live="polite"></p>
+      </section>
+
+      <section class="panel" style="margin-top: 20px;">
+        <div class="content-header">
+          <h2 style="font-size: 1.4rem;">Fila financeira</h2>
+          <p class="muted">Acompanhe o ciclo de aprovacao e pagamento em tempo real.</p>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Descricao</th>
+              <th>Beneficiario</th>
+              <th>Categoria</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Acoes</th>
+            </tr>
+          </thead>
+          <tbody data-testid="transactions-table-body"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/transactions.js"></script>
+  </body>
+</html>

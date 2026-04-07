@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentinel Finance | Extrato</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="content-header">
+          <p class="eyebrow">Sentinel Finance OS</p>
+          <h1 data-testid="statement-page-title">Extrato consolidado</h1>
+          <p class="muted">Valide os lancamentos financeiros por status e acompanhe a composicao do saldo.</p>
+        </div>
+        <div class="user-area">
+          <div>
+            <strong data-testid="app-user-name">Carregando...</strong>
+            <div class="muted" data-testid="app-user-role"></div>
+          </div>
+          <button class="button button--secondary" type="button" data-testid="logout-button">Sair</button>
+        </div>
+      </header>
+
+      <nav class="nav-tabs">
+        <a href="/dashboard" data-nav="dashboard">Dashboard</a>
+        <a href="/transactions" data-nav="transactions">Transacoes</a>
+        <a href="/statement" data-nav="statement">Extrato</a>
+        <a href="/reports" data-nav="reports">Relatorios</a>
+      </nav>
+
+      <section class="card-grid">
+        <article class="metric-card">
+          <div class="metric-label">Volume total no extrato</div>
+          <div class="metric-value metric-value--compact" data-testid="statement-total-volume">-</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">Pago</div>
+          <div class="metric-value metric-value--compact" data-testid="statement-paid-total">-</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">Aprovado</div>
+          <div class="metric-value metric-value--compact" data-testid="statement-approved-total">-</div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">Pendente</div>
+          <div class="metric-value metric-value--compact" data-testid="statement-pending-total">-</div>
+        </article>
+      </section>
+
+      <section class="panel" style="margin-top: 20px;">
+        <div class="content-header">
+          <h2 style="font-size: 1.4rem;">Filtros do extrato</h2>
+          <p class="muted">Use o filtro para validar regras funcionais e cobertura por estado financeiro.</p>
+        </div>
+
+        <div class="field-group" style="max-width: 280px;">
+          <label for="statement-status">Status</label>
+          <select id="statement-status" data-testid="statement-status-filter">
+            <option value="">Todos</option>
+            <option value="pendente">Pendente</option>
+            <option value="aprovado">Aprovado</option>
+            <option value="pago">Pago</option>
+          </select>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Descricao</th>
+              <th>Beneficiario</th>
+              <th>Valor</th>
+              <th>Status</th>
+              <th>Responsavel</th>
+            </tr>
+          </thead>
+          <tbody data-testid="statement-table-body"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/statement.js"></script>
+  </body>
+</html>

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentinel Finance | Login</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
+    <main class="login-layout">
+      <section class="login-panel">
+        <p class="eyebrow">Sentinel Finance OS</p>
+        <h1>Operacao financeira com rastreabilidade real para QA.</h1>
+        <p>
+          Ambiente demo com autenticacao, criacao de transacoes, extrato, relatorios e fluxo de status
+          para validar qualidade ponta a ponta com Playwright e K6.
+        </p>
+        <div class="credential-card">
+          <strong>Credencial seeded para os testes</strong>
+          <code>
+            email: finance.manager@sentinel.local
+            <br />
+            senha: Playwright@123
+          </code>
+        </div>
+      </section>
+
+      <section class="login-form-shell">
+        <div class="login-form-card">
+          <p class="eyebrow">Acesso</p>
+          <h2 data-testid="login-page-title">Entrar no cockpit financeiro</h2>
+          <p class="muted">Autentique-se para operar transacoes, acompanhar o extrato e gerar relatorios.</p>
+
+          <form data-testid="login-form">
+            <div class="field-group">
+              <label for="email">Email corporativo</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                data-testid="login-email-input"
+                value="finance.manager@sentinel.local"
+                autocomplete="username"
+                required
+              />
+            </div>
+
+            <div class="field-group">
+              <label for="password">Senha</label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                data-testid="login-password-input"
+                value="Playwright@123"
+                autocomplete="current-password"
+                required
+              />
+            </div>
+
+            <p class="feedback" data-testid="login-error-alert" aria-live="polite"></p>
+
+            <button class="button button--primary" type="submit" data-testid="login-submit-button">
+              Entrar no sistema
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
+
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/login.js"></script>
+  </body>
+</html>
