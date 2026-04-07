@@ -1,10 +1,19 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
 export class FinanceApiClient {
-  constructor(
-    private readonly request: APIRequestContext,
-    private readonly token?: string,
-  ) {}
+  private token?: string;
+
+  constructor(private readonly request: APIRequestContext) {}
+
+  private authOptions() {
+    return this.token
+      ? {
+          headers: {
+            Authorization: `Bearer ${this.token}`,
+          },
+        }
+      : {};
+  }
 
   private async parse<T>(response: APIResponse): Promise<T> {
     const contentType = response.headers()['content-type'] ?? '';
@@ -17,15 +26,12 @@ export class FinanceApiClient {
     return payload as T;
   }
 
-  private withAuth(data?: unknown) {
-    return {
-      data,
-      headers: this.token
-        ? {
-            Authorization: `Bearer ${this.token}`,
-          }
-        : undefined,
-    };
+  async resetState(): Promise<void> {
+    const response = await this.request.post('/api/test/reset');
+
+    if (response.status() !== 204) {
+      throw new Error(`Reset endpoint failed with status ${response.status()}.`);
+    }
   }
 
   async login(email: string, password: string) {
@@ -33,7 +39,7 @@ export class FinanceApiClient {
       data: { email, password },
     });
 
-    return this.parse<{
+    const payload = await this.parse<{
       message: string;
       token: string;
       user: {
@@ -43,25 +49,34 @@ export class FinanceApiClient {
         role: string;
       };
     }>(response);
+
+    this.token = payload.token;
+    return payload;
   }
 
   async getCurrentUser() {
-    const response = await this.request.get('/api/me', this.withAuth());
+    const response = await this.request.get('/api/me', this.authOptions());
     return this.parse<{ user: { name: string; email: string; role: string } }>(response);
   }
 
   async createUser(payload: { name: string; email: string; password: string; role: string }) {
-    const response = await this.request.post('/api/users', this.withAuth(payload));
+    const response = await this.request.post('/api/users', {
+      ...this.authOptions(),
+      data: payload,
+    });
     return this.parse<{ message: string; user: { name: string; email: string; role: string } }>(response);
   }
 
   async listTransactions() {
-    const response = await this.request.get('/api/transactions', this.withAuth());
+    const response = await this.request.get('/api/transactions', this.authOptions());
     return this.parse<{ transactions: Array<{ id: string; description: string; amount: number; status: string }> }>(response);
   }
 
   async createTransaction(payload: { description: string; beneficiary: string; category: string; amount: number }) {
-    const response = await this.request.post('/api/transactions', this.withAuth(payload));
+    const response = await this.request.post('/api/transactions', {
+      ...this.authOptions(),
+      data: payload,
+    });
     return this.parse<{
       message: string;
       transaction: { id: string; description: string; amount: number; status: string; beneficiary: string };
@@ -69,7 +84,11 @@ export class FinanceApiClient {
   }
 
   async updateTransactionStatus(transactionId: string, status: 'pendente' | 'aprovado' | 'pago') {
-    const response = await this.request.patch(`/api/transactions/${transactionId}/status`, this.withAuth({ status }));
+    const response = await this.request.patch(`/api/transactions/${transactionId}/status`, {
+      ...this.authOptions(),
+      data: { status },
+    });
+
     return this.parse<{
       message: string;
       transaction: { id: string; description: string; amount: number; status: string };
@@ -78,7 +97,7 @@ export class FinanceApiClient {
 
   async getStatement(status?: 'pendente' | 'aprovado' | 'pago') {
     const query = status ? `?status=${status}` : '';
-    const response = await this.request.get(`/api/statement${query}`, this.withAuth());
+    const response = await this.request.get(`/api/statement${query}`, this.authOptions());
     return this.parse<{
       statement: {
         entries: Array<{ id: string; description: string; amount: number; status: string }>;
@@ -94,7 +113,7 @@ export class FinanceApiClient {
   }
 
   async getReportSummary() {
-    const response = await this.request.get('/api/reports/summary', this.withAuth());
+    const response = await this.request.get('/api/reports/summary', this.authOptions());
     return this.parse<{
       summary: {
         totalTransactions: number;
