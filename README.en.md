@@ -141,13 +141,19 @@ npm run test:e2e
 npm run test:api
 ```
 
-### 6. Run all Playwright suites
+### 6. Run security tests
+
+```bash
+npm run test:security
+```
+
+### 7. Run all Playwright suites
 
 ```bash
 npm test
 ```
 
-### 7. Open the Playwright HTML report
+### 8. Open the Playwright HTML report
 
 ```bash
 npm run report:open
@@ -188,6 +194,30 @@ It performs:
 - API execution
 - artifact upload for reports, logs, traces and screenshots
 - optional K6 smoke execution on `main` or manual dispatch
+
+A dedicated security gate is also available in `.github/workflows/security.yml` so authentication, authorization, session, header and payload-tampering checks can run independently in CI/CD.
+
+## Security regression suite
+
+The security lane is intentionally pragmatic and low-noise. It covers the controls that are observable in the local demo application and keeps its evidence traceable for shift-left usage in pull requests and pipelines.
+
+### Covered scope
+
+- invalid authentication and basic brute-force rate limiting
+- broken authorization around manager-only user creation
+- payload tampering on transaction creation and status changes
+- session cookie hardening and logout invalidation
+- security headers and non-permissive CORS defaults
+- error responses without stack traces or password leakage
+- safe rendering of script-like transaction descriptions
+
+### Limitations
+
+- checks run only against local dev/test data and never against production
+- HTTPS-only validations such as `Secure` cookies remain manual checks for real ingress layers
+- DAST, SAST, dependency scanning, secret scanning and container scanning are recommended complementary layers
+
+See [SECURITY_TEST_PLAN.md](./SECURITY_TEST_PLAN.md) for the full plan and OWASP mapping.
 
 ## Branching and professional Git flow
 
