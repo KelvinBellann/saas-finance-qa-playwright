@@ -77,5 +77,23 @@ export default defineConfig({
         },
       },
     },
+    {
+      name: 'security-api',
+      testMatch: /tests[\\/]+security[\\/]+api[\\/].*\.spec\.ts/,
+      use: {
+        baseURL,
+        extraHTTPHeaders: {
+          Accept: 'application/json',
+        },
+      },
+    },
+    {
+      name: 'security-ui',
+      testMatch: /tests[\\/]+security[\\/]+e2e[\\/].*\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        baseURL,
+      },
+    },
   ],
 });

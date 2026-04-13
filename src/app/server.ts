@@ -4,6 +4,7 @@ import express from 'express';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { financeStore } from './data/finance-store.js';
+import { applySecurityMiddleware } from './security.js';
 import { registerApiRoutes } from './routes/api.js';
 import { registerPageRoutes } from './routes/pages.js';
 
@@ -14,6 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, 'public');
 const port = Number(process.env.PORT ?? 3000);
 
+applySecurityMiddleware(app);
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

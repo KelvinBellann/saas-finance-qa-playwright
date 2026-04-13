@@ -14,6 +14,7 @@
     "test": "npm run test:all",
     "test:all": "npm run test:e2e && npm run test:api",
     "test:e2e": "playwright test tests/e2e",
+    "test:security": "playwright test --project=security-api --project=security-ui",
     "test:e2e:headed": "playwright test tests/e2e --project=chromium --headed",
     "test:e2e:ci": "playwright test tests/e2e",
     "test:api": "playwright test tests/api --project=api",

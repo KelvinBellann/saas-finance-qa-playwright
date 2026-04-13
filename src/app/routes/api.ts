@@ -1,5 +1,6 @@
 import type { Express, RequestHandler, Response } from 'express';
 import { resolveSessionToken, SESSION_COOKIE_NAME } from '../auth.js';
+import { clearLoginRateLimitForRequest, clearLoginRateLimitState, createLoginRateLimiter, recordFailedLoginAttempt } from '../security.js';
 import { sanitizeUser, type FinanceStore } from '../data/finance-store.js';
 import type { SafeUser, Transaction, TransactionStatus, UserRole } from '../types/finance.js';
 
@@ -29,6 +30,8 @@ function serializeTransaction(store: FinanceStore, transaction: Transaction) {
 }
 
 export function registerApiRoutes(app: Express, store: FinanceStore): void {
+  const loginRateLimiter = createLoginRateLimiter();
+
   const requireSession: RequestHandler = (request, response, next) => {
     const user = store.getUserBySession(resolveSessionToken(request));
 
@@ -49,21 +52,25 @@ export function registerApiRoutes(app: Express, store: FinanceStore): void {
     });
   });
 
-  app.post('/api/auth/login', (request, response) => {
+  app.post('/api/auth/login', loginRateLimiter, (request, response) => {
     const email = typeof request.body.email === 'string' ? request.body.email : '';
     const password = typeof request.body.password === 'string' ? request.body.password : '';
     const user = store.authenticate(email, password);
 
     if (!user) {
+      recordFailedLoginAttempt(request);
       sendError(response, 401, 'Credenciais invalidas. Verifique email e senha.');
       return;
     }
 
     const sessionId = store.createSession(user.id);
+    clearLoginRateLimitForRequest(request);
 
     response.cookie(SESSION_COOKIE_NAME, sessionId, {
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'strict',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
     });
 
     response.json({
@@ -181,6 +188,7 @@ export function registerApiRoutes(app: Express, store: FinanceStore): void {
     }
 
     store.reset();
+    clearLoginRateLimitState();
     response.status(204).end();
   });
 }
