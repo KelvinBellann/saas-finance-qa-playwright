@@ -1,4 +1,4 @@
-import { test as base } from '@playwright/test';
+import { expect, test as base } from '@playwright/test';
 import { FinanceApiClient } from './clients/finance-api-client.js';
 import { transactionScenarios, seedTransactionCatalog } from './data/transactions.js';
 import { users } from './data/users.js';
@@ -14,7 +14,11 @@ type AppFixtures = {
   authenticatedPage: import('@playwright/test').Page;
 };
 
-export const test = base.extend<AppFixtures>({
+type FullFixtures = AppFixtures & {
+  resetState: void;
+};
+
+export const test = base.extend<FullFixtures>({
   testData: async ({}, use) => {
     await use({
       users,
@@ -23,23 +27,24 @@ export const test = base.extend<AppFixtures>({
     });
   },
 
+  resetState: [
+    async ({ request }, use) => {
+      const response = await request.post('/api/test/reset');
+
+      if (response.status() !== 204) {
+        throw new Error(`Expected reset endpoint to return 204, received ${response.status()}.`);
+      }
+
+      await use();
+    },
+    { auto: true },
+  ],
+
   financeApi: async ({ request }, use) => {
-    const resetResponse = await request.post('/api/test/reset');
-
-    if (resetResponse.status() !== 204) {
-      throw new Error(`Expected reset endpoint to return 204, received ${resetResponse.status()}.`);
-    }
-
     await use(new FinanceApiClient(request));
   },
 
-  authenticatedPage: async ({ page, request, testData }, use) => {
-    const response = await request.post('/api/test/reset');
-
-    if (response.status() !== 204) {
-      throw new Error(`Expected reset endpoint to return 204, received ${response.status()}.`);
-    }
-
+  authenticatedPage: async ({ page, testData }, use) => {
     const loginPage = new LoginPage(page);
     await loginPage.goto();
     await loginPage.login(testData.users.financeManager.email, testData.users.financeManager.password);
@@ -47,4 +52,4 @@ export const test = base.extend<AppFixtures>({
   },
 });
 
-export { expect } from '@playwright/test';
+export { expect };
